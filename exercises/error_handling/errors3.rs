@@ -11,7 +11,10 @@
 
 use std::num::ParseIntError;
 
-fn main() {
+fn main() -> Result<(),ParseIntError>{
+        // 如果其他函数可以返回“Result”，为什么不应该返回“main”？这很常见
+        // 约定从主函数返回类似Result<（），ErrorType>的东西。
+        // 注意正确时还要返回Ok(())
     let mut tokens = 100;
     let pretend_user_input = "8";
 
@@ -23,6 +26,7 @@ fn main() {
         tokens -= cost;
         println!("You now have {} tokens.", tokens);
     }
+    Ok(())
 }
 
 pub fn total_cost(item_quantity: &str) -> Result<i32, ParseIntError> {

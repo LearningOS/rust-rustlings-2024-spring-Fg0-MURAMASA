@@ -10,13 +10,15 @@
 // hint.
 
 // I AM NOT DONE
-
-pub fn generate_nametag_text(name: String) -> Option<String> {
+// Result<String, String> 是 Rust 中用于处理可能失败的操作的一种枚举类型
+// Ok(T)：表示操作成功，并包含一个类型为 T 的值。T 是成功时返回的数据类型。在你的例子中，T 是 String，表示成功时返回的名牌文本。
+// Err(E)：表示操作失败，并包含一个类型为 E 的错误信息。E 是错误类型。在你的例子中，E 也是 String，表示失败时的错误信息。
+pub fn generate_nametag_text(name: String) -> Result<String, String> {
     if name.is_empty() {
         // Empty names aren't allowed.
-        None
+            Err("`name` was empty; it must be nonempty.".into())
     } else {
-        Some(format!("Hi! My name is {}", name))
+        Ok(format!("Hi! My name is {}",name))
     }
 }
 

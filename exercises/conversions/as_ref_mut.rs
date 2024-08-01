@@ -11,21 +11,24 @@
 
 // Obtain the number of bytes (not characters) in the given argument.
 // TODO: Add the AsRef trait appropriately as a trait bound.
-fn byte_counter<T>(arg: T) -> usize {
+fn byte_counter<T:AsRef<str>>(arg: T) -> usize {
     arg.as_ref().as_bytes().len()
 }
 
 // Obtain the number of characters (not bytes) in the given argument.
 // TODO: Add the AsRef trait appropriately as a trait bound.
-fn char_counter<T>(arg: T) -> usize {
+fn char_counter<T:AsRef<str>>(arg: T) -> usize {
     arg.as_ref().chars().count()
 }
 
 // Squares a number using as_mut().
 // TODO: Add the appropriate trait bound.
-fn num_sq<T>(arg: &mut T) {
+fn num_sq<T:AsMut<u32>>(arg: &mut T) {
     // TODO: Implement the function body.
-    ???
+    // arg.as_mut()返回的是&mut u32，这是一个可变引用，而Rust不允许你直接对两个引用进行算术操作。
+    // 为了修复这个问题，你需要解引用&mut u32，获取其实际的u32值，然后进行计算。
+    let answer = *arg.as_mut();
+    *arg.as_mut() = answer * answer;
 }
 
 #[cfg(test)]

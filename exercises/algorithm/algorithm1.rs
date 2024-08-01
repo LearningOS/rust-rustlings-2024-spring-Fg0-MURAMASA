@@ -9,11 +9,12 @@ use std::ptr::NonNull;
 use std::vec::*;
 
 #[derive(Debug)]
+//定义链表的节点: 值val和指针next
 struct Node<T> {
     val: T,
     next: Option<NonNull<Node<T>>>,
 }
-
+//new函数:创建节点
 impl<T> Node<T> {
     fn new(t: T) -> Node<T> {
         Node {
@@ -22,6 +23,7 @@ impl<T> Node<T> {
         }
     }
 }
+//linklist结构体,长度,头尾指针
 #[derive(Debug)]
 struct LinkedList<T> {
     length: u32,
@@ -34,7 +36,7 @@ impl<T> Default for LinkedList<T> {
         Self::new()
     }
 }
-
+// new方法
 impl<T> LinkedList<T> {
     pub fn new() -> Self {
         Self {
@@ -43,15 +45,24 @@ impl<T> LinkedList<T> {
             end: None,
         }
     }
-
+// add方法
+ //这个函数是一个公共的 (pub) 方法，接收一个可变引用 (&mut self) 和一个类型为 T 的对象 obj，其中 T 是泛型参数。它的目的是将 obj 添加到链表中。
     pub fn add(&mut self, obj: T) {
-        let mut node = Box::new(Node::new(obj));
+        //创建一个新的 Node 实例，将其包装在 Box 中以进行堆分配。Node::new(obj) 是一个构造函数，用于创建一个新的节点。此节点将包含传入的 obj 值。
+        let mut node = Box::new(Node::new(obj));  
         node.next = None;
         let node_ptr = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node)) });
+        // let node_ptr 将 Box 转换为原始指针，并通过 NonNull 包装这个原始指针。NonNull 是一个非空的指针类型，它避免了 Option 的开销，
+        //同时提供了一些额外的安全性保证。unsafe 代码块是因为 Box::into_raw 会丧失 Rust 的内存安全检查，
+        //开发者需要确保这个指针在之后的操作中不会引发问题。= Some(unsafe { NonNull::new_unchecked(Box::into_raw(node)) });
         match self.end {
             None => self.start = node_ptr,
             Some(end_ptr) => unsafe { (*end_ptr.as_ptr()).next = node_ptr },
         }
+        //这个匹配表达式处理了链表的不同状态：
+        //如果链表为空 (self.end 为 None)，即链表没有任何元素，那么新节点成为链表的开始节点 (self.start)。
+        //如果链表不为空 (self.end 为 Some(end_ptr))，则链表的尾节点（end_ptr 指向的节点）的 next 指针被更新为新节点的指针 (node_ptr)。
+
         self.end = node_ptr;
         self.length += 1;
     }
@@ -69,13 +80,33 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> LinkedList<T>
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut len = 0;
+        let mut st = list_a.start;
+        let mut en = list_a.end;
+        if list_a.length==0 {
+            len = list_b.length;
+            st = list_b.start;
+            en = list_b.end;
+        }else if list_b.length==0 {
+            len = list_a.length;
+            st = list_a.start;
+            en = list_a.end;
+        }else{
+            len = list_a.length + list_b.length;
+            st = list_a.start;
+            en = list_b.end;
+            match list_a.end {
+                None => println!("111"),
+                Some(end_ptr) => unsafe { (*end_ptr.as_ptr()).next = list_b.start },
+            }
+        }
+        LinkedList {
+            length: len,
+            start: st,
+            end: en,
         }
 	}
 }

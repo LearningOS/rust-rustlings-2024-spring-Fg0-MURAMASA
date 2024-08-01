@@ -41,6 +41,15 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let(r, g, b) = tuple;
+        if r<0||r>255||g<0||g>255||b<0||b>255{
+            return Err(IntoColorError::IntConversion);
+        }
+        Ok( Color{
+            red: r as u8,
+            green: g as u8,
+            blue: b as u8,
+        })
     }
 }
 
@@ -48,6 +57,15 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let [r, g, b] = arr;
+        if r<0||r>255||g<0||g>255||b<0||b>255{
+            return Err(IntoColorError::IntConversion);
+        }
+        Ok( Color{
+            red: r as u8,
+            green: g as u8,
+            blue: b as u8,
+        })
     }
 }
 
@@ -55,6 +73,27 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3{
+            return Err(IntoColorError::BadLen);
+        }
+        let [r, g, b] = <[i16; 3]>::try_from(slice).map_err(|_| IntoColorError::BadLen)?;
+        //  TryFrom trait 的 try_from 方法尝试将给定的切片 slice 转换为 [i16; 3] 类型的数组。
+        // 切片 slice 需要具有正确的长度（即 3），否则转换会失败。
+        // try_from 方法的返回值是 Result<[i16; 3], _> 类型，其中 _ 是错误类型。成功时返回 Ok([i16; 3])，失败时返回 Err。
+        // map_err 是 Result 类型的方法，用于将 Err 的错误类型映射到另一个错误类型。
+        // |_| IntoColorError::BadLen 是一个闭包，表示将错误类型映射为 IntoColorError::BadLen。
+        // 如果 try_from 返回 Err，map_err 会将错误转换为 IntoColorError::BadLen。
+        // ? 操作符用于从 Result 类型中提取 Ok 值或提前返回 Err。
+        // 如果 try_from(slice) 返回 Ok([r, g, b])，则将 [r, g, b] 解构赋值给 r、g 和 b。
+        // 如果 try_from(slice) 返回 Err，则 ? 操作符会返回 Err(IntoColorError::BadLen)，并从当前函数中返回。
+        if r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 {
+            return Err(IntoColorError::IntConversion);
+        }
+        Ok(Color {
+            red: r as u8,
+            green: g as u8,
+            blue: b as u8,
+        })
     }
 }
 

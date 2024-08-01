@@ -44,7 +44,34 @@ impl Default for Person {
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        //情况1:空字符串返回默认值
+        if s.is_empty(){
+            return Person::default();
+        }
+        //不为空串时, 分割name与age
+        let parts: Vec<&str> = s.split(',').collect();
+        // 情况2: 有多个逗号时
+        if parts.len() != 2 {
+            return Person::default();
+        }
+        // 提取 name 和 age
+        let name = parts[0].to_string();
+        let age_result = parts[1].parse::<usize>();
+
+        // 情况3: 如果 name 为空或 age 解析失败，返回默认值
+        if name.is_empty() || age_result.is_err() {
+            return Person::default();
+        }
+
+        // 情况4: 一切正常, 则创建并返回Person
+        Person {
+            name,
+            age: age_result.unwrap(),
+        }
     }
+    //重要代码:
+        //split(',') 用于将字符串按逗号分割。
+        // parse::<usize>() 尝试将字符串解析为 usize，并处理可能的解析错误。
 }
 
 fn main() {
