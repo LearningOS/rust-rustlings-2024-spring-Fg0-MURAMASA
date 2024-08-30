@@ -8,12 +8,14 @@
 // I AM NOT DONE
 
 mod macros {
+    #[macro_export]
     macro_rules! my_macro {
         () => {
             println!("Check out my macro!");
         };
     }
 }
+// #[macro_export]属性 -> 可以使得宏在当前crate的其他模块和外部crate中可用
 
 fn main() {
     my_macro!();

@@ -11,7 +11,6 @@ use std::thread;
 use std::time::Duration;
 
 struct Queue {
-    length: u32,
     first_half: Vec<u32>,
     second_half: Vec<u32>,
 }
@@ -19,39 +18,46 @@ struct Queue {
 impl Queue {
     fn new() -> Self {
         Queue {
-            length: 10,
             first_half: vec![1, 2, 3, 4, 5],
             second_half: vec![6, 7, 8, 9, 10],
         }
     }
+
+    // 计算总长度的方法
+    fn length(&self) -> usize {
+        self.first_half.len() + self.second_half.len()
+    }
 }
 
-fn send_tx(q: Queue, tx: mpsc::Sender<u32>) -> () {
-    let qc = Arc::new(q);
-    let qc1 = Arc::clone(&qc);
-    let qc2 = Arc::clone(&qc);
-
-    thread::spawn(move || {
-        for val in &qc1.first_half {
+fn send_tx(q: Arc<Queue>, tx: mpsc::Sender<u32>) {
+    let q1 = Arc::clone(&q);
+    let tx1 = tx.clone();
+    let handle1 = thread::spawn(move || {
+        for val in &q1.first_half {
             println!("sending {:?}", val);
-            tx.send(*val).unwrap();
+            tx1.send(*val).unwrap();
             thread::sleep(Duration::from_secs(1));
         }
     });
 
-    thread::spawn(move || {
-        for val in &qc2.second_half {
+    let q2 = Arc::clone(&q);
+    let tx2 = tx.clone();
+    let handle2 = thread::spawn(move || {
+        for val in &q2.second_half {
             println!("sending {:?}", val);
-            tx.send(*val).unwrap();
+            tx2.send(*val).unwrap();
             thread::sleep(Duration::from_secs(1));
         }
     });
+
+    handle1.join().unwrap();
+    handle2.join().unwrap();
 }
 
 fn main() {
     let (tx, rx) = mpsc::channel();
-    let queue = Queue::new();
-    let queue_length = queue.length;
+    let queue = Arc::new(Queue::new());
+    let queue_length = queue.length(); 
 
     send_tx(queue, tx);
 
@@ -62,5 +68,5 @@ fn main() {
     }
 
     println!("total numbers received: {}", total_received);
-    assert_eq!(total_received, queue_length)
+    assert_eq!(total_received, queue_length as u32); 
 }

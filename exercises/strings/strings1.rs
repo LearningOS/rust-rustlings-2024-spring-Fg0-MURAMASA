@@ -13,5 +13,6 @@ fn main() {
 }
 
 fn current_favorite_color() -> String {
-    "blue"
+    "blue".to_string() 
+    //"blue"是一个字符串字面量,其类型是 &str,而不是 String。
 }

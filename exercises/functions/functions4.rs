@@ -15,11 +15,11 @@ fn main() {
     println!("Your sale price is {}", sale_price(original_price));
 }
 
-fn sale_price(price: i32) -> {
+fn sale_price(price: i32) -> u32 {
     if is_even(price) {
-        price - 10
+        (price - 10) as u32
     } else {
-        price - 3
+        (price - 3) as u32
     }
 }
 

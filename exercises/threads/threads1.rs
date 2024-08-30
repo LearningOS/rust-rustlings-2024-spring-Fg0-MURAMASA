@@ -27,6 +27,11 @@ fn main() {
     let mut results: Vec<u128> = vec![];
     for handle in handles {
         // TODO: a struct is returned from thread::spawn, can you use it?
+        let result = handle.join().expect("Thread panicked");
+        results.push(result);
+        // 调用 handle.join() 等待线程完成并获取其返回值。
+        // join()方法返回一个Result类型，expect("Thread panicked")会在线程发生panic时终止程序并输出错误信息。
+        // 将线程的返回值（运行时间）推入results向量中。
     }
 
     if results.len() != 10 {
